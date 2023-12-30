@@ -2,9 +2,9 @@
 #include<cuda_runtime.h>
 #include <time.h>
 
-#define M 1024
-#define N 1024
-#define K 1024
+#define M 64
+#define N 64
+#define K 64
 #define THREAD_PRE_BLOCK 32 
 
 
@@ -13,11 +13,12 @@ __global__ void gemm(int*a, int *b, int *c){
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     c[i*M+j]=0;
     for(int k=0;k<N;k++){
-        c[i*M+j]+=a[i*M+j]+b[i*M+j];
+        c[i*M+j]+=a[i*M+k]*b[k*M+j];
     }
 }
 
 int main(){
+//	freopen("log.out","w",stdout);
     int *a, *b, *c, *c_cmp;
     a = (int*) malloc(M * K * sizeof(int));
     b = (int*) malloc(K * N * sizeof(int));
@@ -26,12 +27,12 @@ int main(){
     srand((unsigned)time(NULL)); 
     for(int i = 0; i < M; i++){
         for(int j = 0; j < K; j++){
-            a[i * K + j] = rand() % 100;
+            a[i * K + j] = rand() % 5;
         }
     }
     for(int i = 0; i < K; i++){
         for(int j = 0; j < N; j++){
-            b[i * N + j] = rand() % 100;
+            b[i * N + j] = rand() % 5;
         }
         
     }
@@ -55,6 +56,22 @@ int main(){
         }
     }
     bool flag = 1;
+    /*
+    printf("c_cmp\n");
+    for(int i = 0; i < M; i++){
+        for(int j = 0; j < N; j++){
+		printf("%d ",c_cmp[i*N+j]);
+        }
+	printf("\n");
+    }
+    printf("c\n");
+    for(int i = 0; i < M; i++){
+        for(int j = 0; j < N; j++){
+		printf("%d ",c[i*N+j]);
+        }
+	printf("\n");
+    }
+    */
     for(int i = 0; i < M; i++){
         for(int j = 0; j < N; j++){
             if(c_cmp[i * N + j] != c[i * N + j]){
