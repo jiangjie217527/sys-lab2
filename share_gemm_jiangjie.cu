@@ -18,11 +18,11 @@ __global__ void gemm(int*a, int *b, int *c){
     __shared__ int Bsub[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
     for(int start=0;start<K;start+=THREAD_PER_BLOCK){
 	if(i<M)
-            Asub[tx][ty]=a[i*M+start+ty];
+            Asub[tx][ty]=a[i*K+start+ty];
 	else
 	    Asub[tx][ty]=0;
 	if(j<N)
-            Bsub[tx][ty]=b[(start+tx)*K+j];
+            Bsub[tx][ty]=b[(start+tx)*N+j];
 	else
 	    Bsub[tx][ty]=0;
 	__syncthreads();
@@ -33,7 +33,7 @@ __global__ void gemm(int*a, int *b, int *c){
 	__syncthreads();
     }
     if(i<M&&j<N)
-	c[i*M+j]=res;
+	c[i*N+j]=res;
 }
 
 int main(){

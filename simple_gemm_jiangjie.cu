@@ -5,13 +5,8 @@
 #define M SIZE__
 #define N SIZE__
 #define K SIZE__
-#define THREAD_PRE_BLOCK 8 
+#define THREAD_PRE_BLOCK 8
 
-
-__global__ void gemm(int*a, int *b, int *c){
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    if(i<M&&j<N){//防止越界
 	/*
     	int res=0,index_a=i*M,index_b=j;
     	for(int k=0;k<K;++k){
@@ -21,11 +16,15 @@ __global__ void gemm(int*a, int *b, int *c){
     	}
 	这样计算下标不会变快
 	*/ 
+__global__ void gemm(int*a, int *b, int *c){
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    if(i<M&&j<N){//防止越界
     	int res=0;
     	for(int k=0;k<K;++k){
-	    res+=a[i*M+k]*b[k*K+j];
+	    res+=a[i*K+k]*b[k*N+j];
     	}
-	c[i*M+j]=res;
+	c[i*N+j]=res;
     }
 }
 
@@ -39,12 +38,12 @@ int main(){
     srand((unsigned)time(NULL)); 
     for(int i = 0; i < M; i++){
         for(int j = 0; j < K; j++){
-            a[i * K + j] = rand() % 1024;
+            a[i * K + j] = rand() % 512;
         }
     }
     for(int i = 0; i < K; i++){
         for(int j = 0; j < N; j++){
-            b[i * N + j] = rand() % 1024;
+            b[i * N + j] = rand() % 512;
         }
         
     }
