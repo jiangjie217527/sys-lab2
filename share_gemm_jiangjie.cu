@@ -14,8 +14,8 @@ __global__ void gemm(int*a, int *b, int *c){
     int tx = threadIdx.x;
     int ty = threadIdx.y;
     int res=0;
-    __shared__ int Asub[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
-    __shared__ int Bsub[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
+    __shared__ int Asub[THREAD_PER_BLOCK][THREAD_PER_BLOCK+1];
+    __shared__ int Bsub[THREAD_PER_BLOCK][THREAD_PER_BLOCK+1];
     for(int start=0;start<K;start+=THREAD_PER_BLOCK){
 	if(i<M)
             Asub[tx][ty]=a[i*K+start+ty];
